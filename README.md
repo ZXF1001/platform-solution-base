@@ -11,13 +11,13 @@
 ### 2. 更改跨域访问设置
   本地写的vue项目想要访问服务器数据，要设置允许跨域访问（CORS）。如果使用nginx代理（将请求通过nginx转发到api服务端口），就不需要跨域。
   1. nginx.conf下的server括号下加入以下内容：
-    ```
-    add_header 'Access-Control-Allow-Methods' 'GET,OPTIONS,POST' always;
-    add_header 'Access-Control-Allow-Credentials' 'true' always;
-    add_header 'Access-Control-Allow-Origin' $http_origin always;
-    add_header 'Access-Control-Allow-Headers' 'Authorization, Content-Type, X-Requested-With, Cache-Control' always;
-    if ($request_method = OPTIONS ) { return 200; }
-    ```
+  ```
+  add_header 'Access-Control-Allow-Methods' 'GET,OPTIONS,POST' always;
+  add_header 'Access-Control-Allow-Credentials' 'true' always;
+  add_header 'Access-Control-Allow-Origin' $http_origin always;
+  add_header 'Access-Control-Allow-Headers' 'Authorization, Content-Type, X-Requested-With, Cache-Control' always;
+  if ($request_method = OPTIONS ) { return 200; }
+  ```
 
   2. 重启ngxin：`service nginx restart`
 
