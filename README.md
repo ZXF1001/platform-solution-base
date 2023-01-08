@@ -24,7 +24,7 @@
 ### 3. 开放端口方法
   能通过nginx转发就尽量不要直接对外开放，不安全
   1. 修改本机防火墙策略表：`vim /etc/sysconfig/iptables`
-  2. 插入：`-A INPUT -p tcp -m tcp --dport 1234 -j ACCEPT`
+  2. 插入：`-A INPUT -p tcp -m tcp --dport 1234 -j ACCEPT`（针对需要全部开放的端口如http(s)端口80和443）或`-A INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT`（针对需要安全的端口，如MySQL的3306）
   3. 重启防火墙：`service iptables restart`
   4. 开启云服务器供应商的防火墙
 
@@ -39,7 +39,7 @@
       }
   ```
   2. 如果是远程调试，要记得加上跨域访问请求头
-  3. 给目录添加权限：`chmod -R 777 /home/Website/geotiff/`(如果还是不行就给整个项目路径/home/Website加上权限)
+  3. 给目录添加权限：`chmod -R 777 /home/Website/geotiff/`
   4. 重启nginx
 
 ### 5. Nginx托管api接口
