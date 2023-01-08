@@ -1,6 +1,6 @@
 # 网页平台相关操作记录
 
-## 一. CentOS服务器配置相关
+## CentOS服务器配置相关
 
 ### 1. 网站服务器的开启（使用Linux+Nginx+MySQL+PHP即lnmp）
   1. lnmp官网装lnmp环境
@@ -28,7 +28,60 @@
   3. 重启防火墙：`service iptables restart`
   4. 开启云服务器供应商的防火墙
 
-## 二. 数据库相关
+### 4. Nginx设置虚拟目录托管静态文件
+  比如在浏览器输入：`http://ip地址/static/xxx.jpg`，nginx自动代理到资源文件夹下
+  1. 在nginx.conf中添加location设置：
+  ```
+  location ~ /geotiff/ {
+      root  /home/Website/;
+      #或者alias /home/Website/geotiff也可以
+      # autoindex on;#开启文件目录形式
+      }
+  ```
+  2. 如果是远程调试，要记得加上跨域访问请求头
+  3. 给目录添加权限：`chmod -R 777 /home/Website/geotiff/`(如果还是不行就给整个项目路径/home/Website加上权限)
+  4. 重启nginx
+
+### 5. Nginx托管api接口
+  比如在浏览器输入：`http://ip地址/api/xxx`，nginx自动代理到api服务端口`http://ip地址:3000/api/xxx`
+  1. 在nginx.conf中添加location设置：
+  ```
+  location ~ /api/ {
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $http_host;
+      #proxy_set_header X-Nginx-Proxy true;
+      proxy_set_header Connection "";
+      proxy_pass http://127.0.0.1:3000;
+  }
+  ```
+  2. 重启nginx
+
+### 6. Nginx托管websocket接口
+  比如前端使用websocket服务：`ws://ip地址/ws/`，nginx自动代理到ws服务端口`http://ip地址:8082/`
+  1. 在nginx.conf中添加http设置：
+  ```
+  #My WebSocket Proxy Config
+  map $http_upgrade $connection_upgrade {
+      default upgrade;
+      '' close;
+  }
+  ```
+  2. 添加server设置：
+  ```
+  location /ws/ {
+      proxy_pass http://127.0.0.1:8082;
+      proxy_http_version 1.1;
+      #以下配置添加代理头部：
+      proxy_set_header Host $host; # 保留源信息
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection $connection_upgrade;
+  }
+  ```
+  3. 重启nginx
+
+## 数据库相关
 
 ### 1. 数据库忘记密码
   版本：MySQL 5.7
@@ -83,7 +136,7 @@
 ### 4. 查询相关的SQL语句
   以上面的风速测量数据为例，记录在[这里](./content/SQL.md)。（仅参考，要根据实际的数据表结构考虑）
 
-## 三. 服务器后端api的开发
+## 服务器后端api的开发
 
 ### 1. 常用框架：
   - CakePHP (PHP语言)
@@ -119,7 +172,7 @@
   kill 12345 #杀掉进程
   ```
 
-## 四. Git相关
+## Git相关
 
 ### 1. Github被墙时，命令行Git提交的方法
   就算挂了梯子，用命令行提交到git的时候也没有用，需要设置命令行代理：
