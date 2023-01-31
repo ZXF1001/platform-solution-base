@@ -1,6 +1,6 @@
 # 常用MySQL语法
 1. 列举所有的测风塔  
-```
+```SQL
 SELECT DISTINCT site FROM zb_wind_data;
 
 > +------+
@@ -11,14 +11,14 @@ SELECT DISTINCT site FROM zb_wind_data;
   +------+
 ```
 2. 查询0305测风塔所有的70m风速风向数据，按时间从早到晚排序（其他高度，其他测风塔同理）  
-```
+```SQL
 SELECT date,time,70m_v_avg,70m_deg_avg
 FROM zb_wind_data  
 WHERE site="0305"
 ORDER BY date ASC,time ASC;
 
 > |  2016-1-1  | 00:10:00 |       7.2 |         171 |
-       ...         ...         ...          ...
+  |    ...     |   ...    |    ...    |     ...     |
   | 2016-12-31 | 23:20:00 |       6.5 |         236 |
   | 2016-12-31 | 23:30:00 |         8 |         239 |
   | 2016-12-31 | 23:40:00 |         7 |         227 |
@@ -27,7 +27,7 @@ ORDER BY date ASC,time ASC;
 52147 rows in set (0.23 sec)
 ```
 3. 查询0305测风塔的70m风速数据总条数  
-```
+```SQL
 SELECT COUNT(70m_v_avg)
 AS total_num
 FROM zb_wind_data
@@ -40,7 +40,7 @@ WHERE site="0305";
   +-----------+
 ```
 4. 查询0305测风塔的70m风速在[3,5)区间内的计数  
-```
+```SQL
 SELECT COUNT(70m_v_avg)
 AS selected_num
 FROM zb_wind_data
@@ -55,7 +55,7 @@ AND 70m_v_avg<5;
   +--------------+
 ```
 5. 查询最新时间前一小时的0305测风塔的70m风速风向数据
-```
+```SQL
 SELECT str_to_date(CONCAT(date,' ',time),'%Y-%m-%d %H:%i:%s') AS datetime,
 70m_v_avg AS speed,
 70m_deg_avg AS degree
@@ -82,7 +82,7 @@ ORDER BY date ASC,time ASC;
   +---------------------+-----------+-------------+
 ```
 6. 查询指定日期时间区间内(2016.10.18 23:10-2016.10.19 00:40)的0305测风塔的70m风速风向数据  
-```
+```SQL
 SELECT str_to_date(CONCAT(date,' ',time),'%Y-%m-%d %H:%i:%s') AS datetime,
 70m_v_avg AS speed,
 70m_deg_avg AS degree
@@ -107,7 +107,7 @@ ORDER BY date ASC,time ASC;
   |         ...         |  ...  |   ...  |
 ```
 7. 在所有数据中查询0305测风塔70m的风向频率统计
-```
+```SQL
 SELECT ROUND(70m_deg_avg/22.5)%16 AS direction,
 COUNT(70m_v_avg) AS f
 FROM zb_wind_data
@@ -137,7 +137,7 @@ GROUP BY ROUND(70m_deg_avg/22.5)%16;
 ```
 
 8. 查询日期范围内0305测风塔的70m风速风向数据，对在[3-5)m/s的风速，按风向所在扇区分组统计频率
-``` 
+```SQL
 SELECT ROUND(70m_deg_avg/22.5)%16 AS direction,
 COUNT(70m_v_avg)
 /
@@ -180,7 +180,7 @@ GROUP BY ROUND(70m_deg_avg/22.5)%16;
   +-----------+--------+
 ```
 9. 查询所有的高度字段（要求既有风速又有风向）
-```
+```SQL
 SELECT height
 FROM (
   SELECT SUBSTRING_INDEX(
@@ -207,7 +207,7 @@ HAVING COUNT(height)=2;
 
 ```
 10. 查询0305测风塔70m高度第1扇区（NNE）在2016-2-1 13:00至2016-2-10 19:00时间范围内的风速分布
-```
+```SQL
 SELECT FLOOR(70m_v_avg) AS rangeStart,
 COUNT(FLOOR(70m_v_avg)) AS count
 FROM zb_wind_data
@@ -228,7 +228,7 @@ GROUP BY FLOOR(70m_v_avg);
   +------------+-------+
 ```
 11. 按照最近某段时间不同的时间粒度（1小时/1天）返回速度均值
-```
+```SQL
 SELECT str_to_date(
   CONCAT(date,' ',HOUR(time),':',MINUTE(time),':',SECOND(time)),'%Y-%m-%d %H:%i:%s'
   ) AS datetime,

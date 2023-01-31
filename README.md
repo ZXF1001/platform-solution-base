@@ -6,12 +6,12 @@
   1. lnmp官网装lnmp环境
   2. 更改nginx配置：`vim /usr/local/nginx/conf/nginx.conf`
   3. 把server大括号内里的默认网页根目录改成想要的根目录
-  4. 把网页拷进新的目录：`chmod -R 777 目录（如果涉及到上传文件的功能，必须赋予所有用户写入权限）`
+  4. 把网页拷进新的目录，访问域名，如果不成功，要加权限：`chmod -R 777 目录（如果涉及到上传文件的功能，必须赋予所有用户写入权限）`
 
 ### 2. 更改跨域访问设置
   本地写的vue项目想要访问服务器数据，要设置允许跨域访问（CORS）。如果使用nginx代理（将请求通过nginx转发到api服务端口），就不需要跨域。
   1. nginx.conf下的server括号下加入以下内容：
-  ```
+  ```NGINX Conf
   add_header 'Access-Control-Allow-Methods' 'GET,OPTIONS,POST' always;
   add_header 'Access-Control-Allow-Credentials' 'true' always;
   add_header 'Access-Control-Allow-Origin' $http_origin always;
@@ -31,7 +31,7 @@
 ### 4. Nginx设置虚拟目录托管静态文件
   比如在浏览器输入：`http://ip地址/static/xxx.jpg`，nginx自动代理到资源文件夹下
   1. 在nginx.conf中添加location设置：
-  ```
+  ```NGINX Conf
   location ~ /geotiff/ {
       root  /home/Website/;
       #或者alias /home/Website/geotiff也可以
@@ -45,7 +45,7 @@
 ### 5. Nginx托管api接口
   比如在浏览器输入：`http://ip地址/api/xxx`，nginx自动代理到api服务端口`http://ip地址:3000/api/xxx`
   1. 在nginx.conf中添加location设置：
-  ```
+  ```NGINX Conf
   location ~ /api/ {
       proxy_set_header X-Real-IP $remote_addr;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -60,7 +60,7 @@
 ### 6. Nginx托管websocket接口
   比如前端使用websocket服务：`ws://ip地址/ws/`，nginx自动代理到ws服务端口`http://ip地址:8082/`
   1. 在nginx.conf中添加http设置：
-  ```
+  ```NGINX Conf
   #My WebSocket Proxy Config
   map $http_upgrade $connection_upgrade {
       default upgrade;
@@ -68,7 +68,7 @@
   }
   ```
   2. 添加server设置：
-  ```
+  ```NGINX Conf
   location /ws/ {
       proxy_pass http://127.0.0.1:8082;
       proxy_http_version 1.1;
@@ -92,7 +92,7 @@
   4. 启动数据库：`service mysql start`
   5. 直接输入`mysql`登录数据库
   6. 重设root用户：
-  ```
+  ```SQL
   UPDATE mysql.user
   SET authentication_string=PASSWORD('newp_assword')
   WHERE user='root' AND host='localhost';
@@ -104,7 +104,7 @@
 
 ### 2. 数据库创建只读用户
   因为给root用户设置远程权限太危险，所以最好创建一个只能读写的用户进行远程连接。
-  ```
+  ```SQL
   GRANT CREATE,SELECT,INSERT ON your_data_base.* TO username@"%" IDENTIFIED BY "password";
 
   flush privileges;
@@ -112,7 +112,7 @@
 
 ### 3. 建表的SQL语句
   以上传风速测量数据为例：
-  ```
+  ```SQL
   CREATE TABLE IF NOT EXISTS `zb_wind_data`(
     `id` INT UNSIGNED AUTO_INCREMENT,
     `date` DATE,
@@ -161,13 +161,13 @@
 
 ### 4. 服务如何常驻、终止
   1. 通过screen指令可以让服务在后端长时间运行：
-  ```
+  ```Linux
   screen -S name #以name为代号开一个进程
   screen -r name #重新打开关闭的进程
   ```
   2. 或者通过nohup指令后台运行
   3. 终止后台运行的nodemon进程
-  ```
+  ```Linux
   ps -ef | grep nodemon #查找进程
   kill 12345 #杀掉进程
   ```
@@ -178,7 +178,7 @@
   就算挂了梯子，用命令行提交到git的时候也没有用，需要设置命令行代理：
   1. 挂梯子
   2. 设置命令行代理：
-  ```
+  ```Powershell
   #端口号11223是梯子的端口号
   git config --global http.proxy http://127.0.0.1:11223
   git config --global https.proxy http://127.0.0.1:11223
